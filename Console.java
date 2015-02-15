@@ -3,12 +3,7 @@ package Soni;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -36,10 +31,13 @@ public class Console {
 		option.addOption("u", true, "Username");
 		option.addOption("p", true, "Passwort");
 		option.addOption("d", true, "Datenbankname");
-		
+		option.addOption("o", true, "RMFilename");
+		option.addOption("e", true, "DotFilename");
+
 		try {
 			CommandLine cmd = parser.parse(option, args);
 			BufferedWriter bw = null;
+			BufferedWriter bw2 = null;
 			/*
 			 *lesen aus der console
 			 * und die einzelnen options getrennt speichern um sie später zu verwalten
@@ -47,10 +45,9 @@ public class Console {
 			String servername = cmd.getOptionValue("h");
 			String username = cmd.getOptionValue("u");
 			String passwort = cmd.getOptionValue("p");
-			String datenbankname = cmd.getOptionValue("d");//muss auch gesetzt werden
-			/*
-			 * lesen ob etwas drinnen ist und falls nicht auf default wert setzten bzw ignorieren
-			 */
+			String datenbankname = cmd.getOptionValue("d");//muss gesetzt werden
+			String rmFilename = cmd.getOptionValue("o");
+			String dotFilename = cmd.getOptionValue("e");
 			if (cmd.hasOption("h")==false) {
 				servername = "localhost";
 			}
@@ -60,21 +57,35 @@ public class Console {
 			if (cmd.hasOption("p")==false) {
 				passwort = "";
 			}
-			/*
-			 * Fehler * im cmd deswegen keyword gesetzt
-			 */
-			String res= Conect.select(servername, username, passwort,datenbankname);
-			System.out.println(res);
-		}catch (ParseException e) {
+			if (cmd.hasOption("o")==false) {
+				rmFilename = "RmTest";
+			}
+			if (cmd.hasOption("e")==false) {
+				dotFilename = "ERDTest";
+			}
+			ArrayList<String> res= Conect.rmdotString(servername, username, passwort,datenbankname);
+			FileWriter fw = new FileWriter(rmFilename + ".txt");
+			FileWriter fw2 = new FileWriter(dotFilename + ".dot");
+			bw = new BufferedWriter(fw);
+			bw2= new BufferedWriter(fw2);
+			bw2.write(res.get(0));
+			bw.write(res.get(1));
+			bw.close();
+			bw2.close();
+			System.out.println("\n"+"Ihr Rm wurde als "+rmFilename + ".txt gespeichert"+"\n"+"Ein dot fil " +dotFilename+".dot wurde für sie erstellt."+"\n"+
+					"Bitte verwenden sie graphviz um ihr erd daraus zu generieren.");
+		}catch (ParseException | IOException e) {
 			System.out.println(e.getMessage());
 			System.out.println("Useable options"+"\n"+"-h ... Hostname des DBMS. Standard: localhost"+"\n"+
-			"-u ... Benutzername. Standard: Benutzername des im Betriebssystem angemeldeten Benutzter"+"\n"+
-			"-p ... Passwort. Alternativ kann ein Passwortprompt angezeigt werden. Standard: keins"+"\n"+
-			"-d ... Name der Datenbank(Pflicht)");
+					"-u ... Benutzername. Standard: Benutzername des im Betriebssystem angemeldeten Benutzter"+"\n"+
+					"-p ... Passwort. Alternativ kann ein Passwortprompt angezeigt werden. Standard: keins"+"\n"+
+					"-d ... Name der Datenbank(Pflicht)"+"\n"+
+					"-o ... Name des RMFiles"+"\n"+
+					"-d ... Name des für das erd benötige dotfile name");
 		}
-		
-		
-		
-		
+
+
+
+
 	}
 }

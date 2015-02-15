@@ -2,9 +2,7 @@ package Soni;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -25,22 +23,19 @@ public class Conect {
 	 * @param tabellenname Name der Tabelle welche abgefragt werden soll
 	 * @return den gesamten Output des eingegeben 
 	 */
-	public static String select(String servername,String username,String passwort,String datenbankname){
-		String ret="";
+	public static ArrayList<String> rmdotString(String servername,String username,String passwort,String datenbankname){
+		String retRm="";
+		String retdot="";
 		Connection con = null;
 		Statement stm = null;
 		ResultSet rsimport = null;
 		ResultSet rstable = null;
 		ResultSet rspk = null;
 		ResultSet rscol = null;
-		ArrayList<String> pk = new ArrayList<String>(); 
-		ArrayList<String> fk = new ArrayList<String>(); 
+		ArrayList<String> ret = new ArrayList<String>(); 
 		DatabaseMetaData metadata= null;
+		Database d = new Database(datenbankname);
 		try {
-			//String driverName = "org.gjt.mm.mysql.Driver";
-			//Class.forName(driverName);
-			//String url = "jdbc:mysql://" + servername + "/" + datenbankname;
-			//con = DriverManager.getConnection(url, username,passwort);
 			MysqlDataSource ds = new MysqlDataSource();
 			ds.setServerName(servername);
 			ds.setPassword(passwort);
@@ -49,46 +44,46 @@ public class Conect {
 
 			con = ds.getConnection();
 			stm = con.createStatement();
-			//ganz normal die query gesetz
 			metadata = con.getMetaData();
 			rstable= metadata.getTables(con.getCatalog(), con.getSchema(), null, null);
 			while (rstable.next()) {
+				d.createtable(rstable.getString(3));
 				rsimport = metadata.getImportedKeys(con.getCatalog(), con.getSchema(), rstable.getString(3));
 				rspk = metadata.getPrimaryKeys(con.getCatalog(), con.getSchema(), rstable.getString(3));
 				rscol= metadata.getColumns(con.getCatalog(), null, rstable.getString(3), null);
-				ret=ret+"\n"+rstable.getString(3)+"(";
 				while (rscol.next()) {
-				while (rsimport.next()) {
+					//					System.out.println(rscol.getString(24)+" "+rscol.getString(4));
 					while (rspk.next()) {
-						pk.add(rspk.getString(4));
+						d.getLastTable().addColum(rspk.getString(4));
+						d.getLastTable().getLastColum().isPk();
+					}	
+					while (rsimport.next()) {
+						if(d.getLastTable().isNewColum(rsimport.getString(8))){
+							d.getLastTable().addColum(rsimport.getString(8));
+							d.getLastTable().getLastColum().isFk(rsimport.getString(3)+"."+rsimport.getString(4),rsimport.getString(3));
+						}else{
+							d.getLastTable().getColum(rsimport.getString(8)).isFk(rsimport.getString(3)+"."+rsimport.getString(4),rsimport.getString(3));
+						}
 					}
-					fk.add(rsimport.getString(8));
-				}
-				if(pk.contains(rscol.getString(4))){
-					if(fk.contains(rscol.getString(4))){
-						ret=ret+"<pk><fk>"+rscol.getString(4)+"</fk></pk>,";
-					}else{
-						ret=ret+"<pk>"+rscol.getString(4)+"</pk>,";
-					}
-				}else{
-					if(fk.contains(rscol.getString(4))){
-						ret=ret+"<fk>"+rscol.getString(4)+"</fk>,";
-					}else{
-						ret=ret+rscol.getString(4)+",";
+					if(rscol.getString(21)==null){
+						if(d.getLastTable().isNewColum(rscol.getString(4))){
+							d.getLastTable().addColum(rscol.getString(4));
+						}
 					}
 				}
 			}
-				ret=ret+")";
-			}
+			retdot=d.dotFormat();
+			ret.add(retdot);
+			retRm=d.rmFormat();
+			ret.add(retRm);
 			stm.close();
 			con.close();
 		} catch (SQLException e ) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-			
-		
+
+
 		return ret;
 	}
 }
