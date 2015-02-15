@@ -45,7 +45,7 @@ public class Database {
 	 * @return Gibt die Datenbank im dot Format zurück.
 	 */
 	public String dotFormat(){
-		String ret="graph {graph[splines=ortho,overlap=false]";
+		String ret="graph {graph[splines=ortho,overlap=false,rankdir=RL]";
 		for(int i=0;i<this.tables.size();i++){
 			ret=ret+this.tables.get(i).dotFormat();
 				ArrayList<String> reft = this.tables.get(i).getReft();

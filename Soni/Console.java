@@ -95,7 +95,7 @@ public class Console {
 					"-p ... Passwort. Alternativ kann ein Passwortprompt angezeigt werden. Standard: keins"+"\n"+
 					"-d ... Name der Datenbank(Pflicht)"+"\n"+
 					"-o ... Name des RMFiles"+"\n"+
-					"-d ... Name des für das erd benötige dotfile name"+"\n"+
+					"-e ... Name des für das erd benötige dotfile name"+"\n"+
 					"-c ... Graphviz notwendig: Der pfad ihres dot.exe"+"\n"+
 					"Syntax \"Pfad\"");
 		}
