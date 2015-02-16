@@ -2,3 +2,13 @@ Manifest-Version: 1.0
 Class-Path: .
 Main-Class: Soni.Console
 
+Name: org/apache/commons/cli2/
+Specification-Version: 2.0
+Specification-Vendor: Apache Software Foundation
+Specification-Title: Jakarta Commons CLI2
+
+Name: org/apache/commons/cli/
+Specification-Version: 1.0
+Specification-Vendor: Apache Software Foundation
+Specification-Title: Jakarta Commons CLI
+

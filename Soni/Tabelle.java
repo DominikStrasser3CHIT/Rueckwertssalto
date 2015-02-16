@@ -65,9 +65,10 @@ public class Tabelle {
 	 */
 	public String rmFormat(){
 		String ret=this.name+"(";
-		for(int i=0;i<this.colum.size();i++){
+		for(int i=0;i<this.colum.size()-1;i++){
 			ret=ret+colum.get(i).rmFormat();
 		}
+		ret=ret+colum.get(this.colum.size()-1).rmFormatLast();
 		ret=ret+");"+"\n";
 		return ret;
 	}
@@ -98,33 +99,20 @@ public class Tabelle {
 		String ret=this.name+" [shape=box];";
 		for(int i=0;i<this.colum.size();i++){
 			String label=" ";
-			if(colum.get(i).isItPk()&&colum.get(i).isItFk()){
-				if(colum.get(i).isItNab()){
-					label=" [label=<<i><u>"+colum.get(i).getName()+" :NOT NULL</u></i>>";
-				}else{
-					label=" [label=<<i><u>"+colum.get(i).getName()+"</u></i>>";
-				}
-			}else{
-				if(colum.get(i).isItPk()){
-					if(colum.get(i).isItNab()){
-						label=" [label=<<u>"+colum.get(i).getName()+" :NOT NULL</u>>";
-					}else{
-						label=" [label=<<u>"+colum.get(i).getName()+"</u>>";
-					}
-				}
-				if(colum.get(i).isItFk()){
-					if(colum.get(i).isItNab()){
-						label=" [label=<<i>"+colum.get(i).getName()+": NOT NULL</i>>";
-					}else{
-						label=" [label=<<i>"+colum.get(i).getName()+"</i>>";
-					}
-				}
-				if((colum.get(i).isItPk()==false&&(colum.get(i).isItFk()==false))){
-					label=" [label="+colum.get(i).getName();
-				}
+			String att=colum.get(i).getName();
+			if(colum.get(i).isItNab()){
+				att=att+":NOT NULL";
 			}
-			ret=ret+colum.get(i).getName()+i+this.name+label+"];";
-			ret=ret+this.name+"--"+colum.get(i).getName()+i+this.name+";";
+			if(colum.get(i).isItPk()){
+				label=" [label=<<u>"+att+"</u>>";
+				ret=ret+colum.get(i).getName()+i+this.name+label+"];";
+				ret=ret+this.name+"--"+colum.get(i).getName()+i+this.name+";";
+			}
+			if((colum.get(i).isItPk()==false&&(colum.get(i).isItFk()==false))){
+				label=" [label="+colum.get(i).getName();
+				ret=ret+colum.get(i).getName()+i+this.name+label+"];";
+				ret=ret+this.name+"--"+colum.get(i).getName()+i+this.name+";";
+			}
 		}
 		ret=ret+"\n";
 		return ret;

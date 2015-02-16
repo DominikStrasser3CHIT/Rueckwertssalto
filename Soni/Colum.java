@@ -80,17 +80,38 @@ public class Colum {
 	public String rmFormat(){
 		String ret=" ";
 		if(this.isfk&&this.ispk){
-			ret=ret+"<pk><fk>"+this.real+"</fk></pk>,";
+			ret=ret+"<pk><fk>"+this.name+":"+this.real+"</fk></pk>,";
 		}else{
 			if(this.ispk){
 				ret=ret+"<pk>"+this.name+"</pk>,";
 			}
 			if(this.isfk){
-				ret=ret+"<fk>"+this.real+"</fk>,";
+				ret=ret+"<fk>"+this.name+":"+this.real+"</fk>,";
 			}
 		}
 		if(this.isfk==false&&this.ispk==false){
 			ret=ret+this.name+",";
+		}
+		return ret;
+	}
+	/**
+	 * @return Gibt das Colum in einem rm Format zurück
+	 * Wandel alle eingegeben Daten in ein Rm format für das column zurück ohne den beistrich für das letzte
+	 */
+	public String rmFormatLast(){
+		String ret=" ";
+		if(this.isfk&&this.ispk){
+			ret=ret+"<pk><fk>"+this.name+":"+this.real+"</fk></pk>";
+		}else{
+			if(this.ispk){
+				ret=ret+"<pk>"+this.name+"</pk>";
+			}
+			if(this.isfk){
+				ret=ret+"<fk>"+this.name+":"+this.real+"</fk>";
+			}
+		}
+		if(this.isfk==false&&this.ispk==false){
+			ret=ret+this.name;
 		}
 		return ret;
 	}
